@@ -1,30 +1,26 @@
-INSERT INTO department (name)
-VALUES ("Human Resources"),
-        ("Accounting"),
-        ("Marketing"),
-        ("Sales");
-
-SELECT * FROM department;
-
-INSERT INTO role (title, salary, department_id) 
-VALUES  ("HR Director", 100000),
-        ("Benefits Administrator", 85000),
-        ("Chief Financial Officer", 250000),
-        ("Accountant", 95000, 2),
-        ("Marketing Director", 100000),
-        ("Sales Manager", 125000),
-        ("Sales Representative", 85000);
-
-        SELECT * FROM Role;
+use employees_db;
 
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
-VALUES  ("Jacob", "Samuel"),
-        ("Amber", "Thompson"),
-        ("Robert", "Chase"),
-        ("Patrick", "O'Brien"),
-        ("Kerrie", "Benz"),
-        ("Luke", "Anderson"),
-        ("Toby", "Arnold");
+VALUES('Jacob', 'Samuel', 1, NULL),
+        ('Robert', 'Chase', 2, 1),
+        ('Amber', 'Thompson', 2, 1),
+        ('Patrick', 'OBrien', 3, NULL),
+        ('Kerrie', 'Benz', 4, 4),
+        ('Luke', 'Anderson', 4, 4),
+        ('Toby', 'Arnold', 5, NULL),
+        ('Jose', 'Garcia', 6, 7),
+        ('Kate', 'Luo', 6, 7);
 
-        SELECT * FROM employee;
- 
+INSERT INTO department (department_name)
+VALUES('Management'),
+        ('Engineering'),
+        ('HR');
+        
+INSERT INTO role (title, salary, department_id) 
+VALUES('CEO', 250000, 1),
+        ('Tech Director', 125000, 2),
+        ('HR Director', 100000, 3),
+        ('CFO', 175000, 1),
+        ('Developer', 850000, 2),
+        ('Admin', 65000, 3);
+    
