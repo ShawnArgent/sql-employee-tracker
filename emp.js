@@ -13,10 +13,10 @@ const connection = mysql.createConnection({
 connection.connect(function (err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
-  choices();
+  userPrompt();
 });
 
-function choices() {
+function userPrompt() {
   inquirer
     .prompt({
       name: "action",
@@ -70,33 +70,33 @@ function choices() {
       }
     });
 }
-viewAllDepartments = () => {
+function viewAllDepartments() {
   const query = "SELECT * FROM department";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table("All Departments:", res);
-    choices();
+    userPrompt();
   });
 };
 function viewAllRoles() {
   connection.query(
-    "SELECT role.id, role.title, role.salary, role.department_id, department.id, department.department_name FROM role LEFT JOIN department on role.department_id = department.id",
+    "SELECT role.id, role.title, department.department_name AS department FROM role INNER JOIN department ON role.role_id = department.id",
     function (err, res) {
       if (err) throw err;
       console.table("All Roles:", res);
-      choices();
+      userPrompt();
     }
   );
 }
 
 function viewAllEmployees() {
   connection.query(
-    "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, employee.manager_id, role.title, role.salary, role.id, department.id,FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id",
+    "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, role.title, department.id, role.salary, FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id",
     function (err, res) {
       if (err) throw err;
       console.log(res.length + "Employees");
       console.table("All Employees:", res);
-      choices();
+      userPrompt();
     }
   );
 }
@@ -118,7 +118,7 @@ function addDepartment() {
       connection.query(query, function (err, res) {
         if (err) throw err;
         console.table(res);
-        choices();
+        userPrompt();
       });
     });
 }
@@ -140,7 +140,7 @@ function addRole() {
         {
           name: "Department",
           type: "list",
-          choices: function () {
+          userPrompt: function () {
             const deptArry = [];
             for (let i = 0; i < res.length; i++) {
               deptArry.push(res[i].name);
@@ -168,13 +168,13 @@ function addRole() {
           function (err) {
             if (err) throw err;
             console.table(res);
-            choices();
-          }
-        );
-      });
-  });
+            userPrompt();
+          })
+        })
+      })
+      };
 
-  function addEmployee() {
+function addEmployee() {
     connection.query("SELECT * FROM role", function (err, res) {
       if (err) throw err;
       inquirer
@@ -197,7 +197,7 @@ function addRole() {
           {
             name: "role",
             type: "list",
-            choices: function () {
+            userPrompt: function () {
               var roleArray = [];
               for (let i = 0; i < res.length; i++) {
                 roleArray.push(res[i].title);
@@ -232,7 +232,7 @@ function addRole() {
         });
     });
   }
-}
+
 
 // exit the app
 function exit() {
