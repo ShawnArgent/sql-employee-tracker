@@ -72,33 +72,25 @@ function userPrompt() {
 }
 function viewAllDepartments() {
   const query = "SELECT * FROM department";
-  connection.query(query, function (err, res) {
+  connection.query(query, (err, res) => {
     if (err) throw err;
-    console.table("All Departments:", res);
+    console.table(res);
     userPrompt();
   });
-};
-function viewAllRoles() {
-  connection.query(
-    "SELECT role.id, role.title, department.department_name AS department FROM role INNER JOIN department ON role.role_id = department.id",
-    function (err, res) {
-      if (err) throw err;
-      console.table("All Roles:", res);
-      userPrompt();
-    }
-  );
 }
-
+function viewAllRoles() {
+  connection.query("SELECT * FROM role", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    userPrompt();
+  });
+}
 function viewAllEmployees() {
-  connection.query(
-    "SELECT employee.id, employee.first_name, employee.last_name, employee.role_id, role.title, department.id, role.salary, FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id",
-    function (err, res) {
-      if (err) throw err;
-      console.log(res.length + "Employees");
-      console.table("All Employees:", res);
-      userPrompt();
-    }
-  );
+  connection.query("SELECT * FROM employee", function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    userPrompt();
+  });
 }
 
 function addDepartment() {
@@ -169,70 +161,70 @@ function addRole() {
             if (err) throw err;
             console.table(res);
             userPrompt();
-          })
-        })
-      })
-      };
+          }
+        );
+      });
+  });
+}
 
 function addEmployee() {
-    connection.query("SELECT * FROM role", function (err, res) {
-      if (err) throw err;
-      inquirer
-        .prompt([
-          {
-            name: "first_name",
-            type: "input",
-            message: "What is the employee's fist name? ",
-          },
-          {
-            name: "last_name",
-            type: "input",
-            message: "What is the employee's last name? ",
-          },
-          {
-            name: "manager_id",
-            type: "input",
-            message: "What is the employee's manager's ID? ",
-          },
-          {
-            name: "role",
-            type: "list",
-            userPrompt: function () {
-              var roleArray = [];
-              for (let i = 0; i < res.length; i++) {
-                roleArray.push(res[i].title);
-              }
-              return roleArray;
-            },
-            message: "What is this employee's role? ",
-          },
-        ])
-        .then(function (answer) {
-          let role_id;
-          for (let a = 0; a < res.length; a++) {
-            if (res[a].title == answer.role) {
-              role_id = res[a].id;
-              console.log(role_id);
+  connection.query("SELECT * FROM role", function (err, res) {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          name: "first_name",
+          type: "input",
+          message: "Enter employee's fist name? ",
+        },
+        {
+          name: "last_name",
+          type: "input",
+          message: "Enter employee's last name? ",
+        },
+        {
+          name: "manager_id",
+          type: "input",
+          message: "Enter employee's manager's ID? ",
+        },
+        {
+          name: "role",
+          type: "list",
+          choices: function () {
+            var roleArray = [];
+            for (let i = 0; i < res.length; i++) {
+              roleArray.push(res[i].title);
             }
+            return roleArray;
+          },
+          message: "Enter employee's role? ",
+        },
+      ])
+      .then(function (answer) {
+        let role_id;
+        for (let a = 0; a < res.length; a++) {
+          if (res[a].title == answer.role) {
+            role_id = res[a].id;
+            console.log(role_id);
           }
-          connection.query(
-            "INSERT INTO employee SET ?",
-            {
-              first_name: answer.first_name,
-              last_name: answer.last_name,
-              manager_id: answer.manager_id,
-              role_id: role_id,
-            },
-            function (err) {
-              if (err) throw err;
-              console.log("Your employee has been added!");
-              options();
-            }
-          );
-        });
-    });
-  }
-
+        }
+        connection.query(
+          "INSERT INTO employee SET ?",
+          {
+            first_name: answer.first_name,
+            last_name: answer.last_name,
+            manager_id: answer.manager_id,
+            role_id: role_id,
+          },
+          function (err) {
+            if (err) throw err;
+            console.log("Employee added.");
+            options();
+          }
+        );
+      });
+  });
+}
 
 // exit the app
 function exit() {
