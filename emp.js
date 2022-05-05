@@ -12,11 +12,10 @@ const connection = mysql.createConnection({
 
 connection.connect(function (err) {
   if (err) throw err;
-  console.log("connected as id " + connection.threadId);
-  userPrompt();
+  promptUser();
 });
 
-function userPrompt() {
+function promptUser() {
   inquirer
     .prompt({
       name: "action",
@@ -34,6 +33,7 @@ function userPrompt() {
         "EXIT",
       ],
     })
+
     .then(function (answer) {
       switch (answer.action) {
         case "View all Departments":
@@ -75,21 +75,22 @@ function viewAllDepartments() {
   connection.query(query, (err, res) => {
     if (err) throw err;
     console.table(res);
-    userPrompt();
+    promptUser();
   });
 }
 function viewAllRoles() {
-  connection.query("SELECT * FROM role", function (err, res) {
+  connection.query( "SELECT * FROM role",
+  function (err, res) {
     if (err) throw err;
     console.table(res);
-    userPrompt();
+    promptUser();
   });
 }
 function viewAllEmployees() {
   connection.query("SELECT * FROM employee", function (err, res) {
     if (err) throw err;
     console.table(res);
-    userPrompt();
+    promptUser();
   });
 }
 
@@ -104,48 +105,50 @@ function addDepartment() {
     ])
     .then(function (answer) {
       connection.query("INSERT INTO department SET ? ", {
-        name: answer.name,
+        name: answer.addDepartment,
       });
       query = "SELECT * FROM department";
       connection.query(query, function (err, res) {
         if (err) throw err;
+        console.log("Department added.");
         console.table(res);
-        userPrompt();
+        promptUser();
       });
     });
 }
 function addRole() {
-  connection.query("SELECT * FROM department", function (err, res) {
+  connection.query("SELECT * FROM department", 
+  function (err, res) {
     if (err) throw err;
     inquirer
       .prompt([
         {
-          name: "Title",
+          name: "title",
           type: "input",
-          message: "Enter role Title?",
+          message: "Enter role title?",
         },
         {
-          name: "Salary",
-          type: "input",
+          name: "salary",
+          type: "number",
           message: "Enter Salary?",
         },
         {
-          name: "Department",
+          name: "department",
           type: "list",
-          userPrompt: function () {
+          message: "Enter Department",
+          choices: function() {
             const deptArry = [];
             for (let i = 0; i < res.length; i++) {
-              deptArry.push(res[i].name);
+              deptArry.push(res[i].department_name);
             }
-
             return deptArry;
           },
-        },
+        }
       ])
       .then(function (answer) {
         let department_id;
         for (let a = 0; a < res.length; a++) {
-          if (res[a].name == answer.Department) {
+          if (res[a].name == answer.department) {
             department_id = res[a].id;
           }
         }
@@ -153,14 +156,15 @@ function addRole() {
         connection.query(
           "INSERT INTO role SET ?",
           {
-            title: answer.Title,
-            salary: answer.Salary,
+            title: answer.title,
+            salary: answer.salary,
             department_id: department_id,
           },
           function (err) {
             if (err) throw err;
+            console.log("Role added.");
             console.table(res);
-            userPrompt();
+            promptUser();
           }
         );
       });
@@ -190,7 +194,7 @@ function addEmployee() {
         {
           name: "role",
           type: "list",
-          choices: function () {
+          choices: function() {
             var roleArray = [];
             for (let i = 0; i < res.length; i++) {
               roleArray.push(res[i].title);
@@ -219,7 +223,8 @@ function addEmployee() {
           function (err) {
             if (err) throw err;
             console.log("Employee added.");
-            options();
+            console.table(res);
+            promptUser();
           }
         );
       });
