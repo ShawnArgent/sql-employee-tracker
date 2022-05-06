@@ -46,7 +46,7 @@ function promptUser() {
           viewAllEmployees();
           break;
 
-        case "Add Deparment":
+        case "Add Department":
           addDepartment();
           break;
 
@@ -58,9 +58,8 @@ function promptUser() {
           addEmployee();
           break;
 
-        case "Exit":
-          exit();
-          break;
+        default:
+          connection.end();
       }
     });
 }
@@ -82,7 +81,7 @@ function viewAllRoles() {
 }
 function viewAllEmployees() {
   const query =
-    "SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.name FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON role.department_id = department.id ORDER BY employee.id ASC";
+    "SELECT employee.id, employee.first_name, employee.last_name, role.title, role.salary, department.department_name FROM employee INNER JOIN role ON role.id = employee.role_id INNER JOIN department ON role.department_id = department.id ORDER BY employee.id ASC";
   connection.query(query, function (err, res) {
     if (err) throw err;
     console.table(res);
@@ -103,12 +102,11 @@ function addDepartment() {
       connection.query(
         "INSERT INTO department SET ?",
         {
-          name: answer.department,
+          department_name: answer.department,
         },
         function (err) {
           if (err) throw err;
-          console.log("Department added!");
-          console.table(res);
+          console.log("Department added.");
           promptUser();
         }
       );
@@ -160,7 +158,6 @@ function addRole() {
           function (err) {
             if (err) throw err;
             console.log("Role added.");
-            console.table(res);
             promptUser();
           }
         );
@@ -220,8 +217,7 @@ function addEmployee() {
           function (err) {
             if (err) throw err;
             console.log("Employee added.");
-            console.table(res);
-            Exit();
+            promptUser();
           }
         );
       });
